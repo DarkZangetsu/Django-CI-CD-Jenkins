@@ -9,9 +9,10 @@ pipeline {
     stages {
         stage('checkout') {
             steps {
-                git url: "https://github.com/DarkZangetsu/Django-CI-CD-Jenkins.git"
+                git branch: 'main', url: 'https://github.com/DarkZangetsu/Django-CI-CD-Jenkins.git'
             }
         }
+
 
         stage('Install dependencies') {
             steps {
