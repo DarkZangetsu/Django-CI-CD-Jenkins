@@ -7,28 +7,21 @@ pipeline {
     }
 
     stages {
-        stage('checkout') {
+        stage('Checkout') {
             steps {
                 git branch: 'main', url: 'https://github.com/DarkZangetsu/Django-CI-CD-Jenkins.git'
-            }
-        }
-
-
-        stage('Install dependencies') {
-            steps {
-                sh 'pip install -r requirements.txt'
-            }
-        }
-
-        stage('Run Tests') {
-            steps {
-                sh 'python manage.py test'
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
+            }
+        }
+
+        stage('Run Tests in Docker') {
+            steps {
+                sh "docker run --rm ${IMAGE_NAME}:${IMAGE_TAG} python manage.py test"
             }
         }
 
@@ -40,22 +33,23 @@ pipeline {
             }
         }
 
-        stage('Run Docker Container'){
+        stage('Run Docker Container') {
             steps {
                 sh "docker run -d --name django-devops-container -p 8000:8000 ${IMAGE_NAME}:${IMAGE_TAG}"
             }
         }
     }
 
-    // Gestion d'erreurs
     post {
         always {
             echo "Pipeline terminé"
         }
-
         failure {
             echo "La pipeline a échoué"
         }
+        success {
+            echo "Pipeline exécuté avec succès!"
+            echo "Application accessible sur http://localhost:8000"
+        }
     }
-    
 }
